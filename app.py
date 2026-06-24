@@ -1,245 +1,233 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from collections import Counter
-from src.load_data import load_candidates
 
 st.set_page_config(
     page_title="AI Candidate Discovery & Ranking",
     layout="wide"
 )
 
+# =========================
+# HEADER
+# =========================
+
 st.title("🚀 AI Candidate Discovery & Ranking System")
 
 st.markdown("""
 ### India Runs Data & AI Challenge
 
-This system ranks candidates using:
+This solution ranks AI/ML candidates using:
 
-- Experience Matching
-- AI Skills Analysis
-- Career History Analysis
-- Redrob Behavioral Signals
-- Semantic Re-ranking
+- AI Skills Matching
+- Experience Analysis
+- Career History Evaluation
+- Recruiter Engagement Signals
+- Interview Reliability Signals
+- Explainable AI Ranking
 """)
+
+# =========================
+# LOAD DATA
+# =========================
+
+df = pd.read_csv("output/final_submission.csv")
+
+# =========================
+# METRICS
+# =========================
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.metric("Total Candidates", "100,000")
+    st.metric(
+        "Top Candidates",
+        len(df)
+    )
 
 with col2:
-    st.metric("Top Ranked Candidate", "Rajesh Reddy")
+    st.metric(
+        "Best Score",
+        round(df["score"].max(), 4)
+    )
 
 with col3:
-    st.metric("Ranking Method", "Hybrid AI")
+    st.metric(
+        "Submission Status",
+        "Valid"
+    )
 
 st.divider()
 
-st.header("🏆 Top 100 Ranked Candidates")
+# =========================
+# TOP 100 TABLE
+# =========================
 
-df = pd.read_csv("output/final_submission.csv")
+st.header("🏆 Top 100 Ranked Candidates")
 
 st.dataframe(
     df,
-    use_container_width=True
+    use_container_width=True,
+    height=500
 )
 
 st.download_button(
     label="📥 Download Submission CSV",
     data=df.to_csv(index=False),
-    file_name="submission.csv",
+    file_name="final_submission.csv",
     mime="text/csv"
 )
 
 st.divider()
 
-candidates = load_candidates("sample_candidates.json")
+# =========================
+# CANDIDATE EXPLORER
+# =========================
 
-candidate_ids = [
-    c["candidate_id"]
-    for c in candidates
-]
+st.header("👤 Candidate Explorer")
 
-st.header("👤 Candidate Profile Viewer")
-
-search_id = st.text_input(
-    "🔍 Search Candidate ID"
+selected_candidate = st.selectbox(
+    "Select Candidate ID",
+    df["candidate_id"]
 )
 
-if search_id and search_id in candidate_ids:
-    selected_id = search_id
-else:
-    selected_id = st.selectbox(
-        "Select Candidate",
-        candidate_ids
+candidate = df[
+    df["candidate_id"] == selected_candidate
+].iloc[0]
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.info(
+        f"Candidate ID: {candidate['candidate_id']}"
     )
 
-selected_candidate = None
-
-for c in candidates:
-    if c["candidate_id"] == selected_id:
-        selected_candidate = c
-        break
-
-
-if selected_candidate:
-
-    profile = selected_candidate["profile"]
-
-    st.subheader("Profile")
-
-    st.write(
-        f"**Name:** {profile['anonymized_name']}"
+    st.success(
+        f"Rank: {candidate['rank']}"
     )
 
-    st.write(
-        f"**Current Title:** {profile['current_title']}"
+with col2:
+    st.warning(
+        f"Score: {candidate['score']}"
     )
 
-    st.write(
-        f"**Experience:** {profile['years_of_experience']} years"
-    )
+# ==================================
+# WHY THIS CANDIDATE WAS SELECTED
+# ==================================
 
-    st.write(
-        f"**Industry:** {profile['current_industry']}"
-    )
+st.header("Why This Candidate Was Selected")
 
-    st.write(
-        f"**Location:** {profile['location']}"
-    )
+reason = candidate["reasoning"]
 
-    st.write(
-        f"**Summary:** {profile['summary']}"
-    )
+st.markdown(
+    f"""
+    <div style="
+        background: linear-gradient(135deg,#0F172A,#1E293B);
+        padding:30px;
+        border-radius:20px;
+        border-left:8px solid #22C55E;
+        box-shadow:0px 0px 20px rgba(34,197,94,0.3);
+        margin-bottom:25px;
+    ">
 
-    st.subheader("Skills")
+    <h2 style="color:#22C55E;">
+        🏆 Selection Justification
+    </h2>
 
-    skills = [
-        s["name"]
-        for s in selected_candidate["skills"]
-    ]
+    <p style="
+        color:white;
+        font-size:20px;
+        line-height:1.8;
+    ">
+        {reason}
+    </p>
 
-    st.write(", ".join(skills))
+    <hr style="border:1px solid #334155;">
 
-    st.subheader("Career History")
+    <h3 style="color:#22C55E;">
+        ✅ Key Reasons
+    </h3>
 
-    for job in selected_candidate["career_history"]:
+    <ul style="
+        color:white;
+        font-size:18px;
+        line-height:2;
+    ">
+        <li>Strong AI / ML skill match</li>
+        <li>Relevant experience for the role</li>
+        <li>High recruiter engagement</li>
+        <li>Strong interview completion history</li>
+        <li>Excellent overall ranking score</li>
+    </ul>
 
-        st.markdown(
-            f"### {job['title']} @ {job['company']}"
-        )
-
-        st.write(job["description"])
-
-        st.divider()
-
-st.header("🤖 Why This Candidate Ranked Highly")
-
-if selected_candidate:
-
-    profile = selected_candidate["profile"]
-    signals = selected_candidate["redrob_signals"]
-
-    st.success("Ranking Explanation")
-
-    st.write(
-        f"✅ {profile['years_of_experience']} years experience"
-    )
-
-    st.write(
-        f"✅ Current Role: {profile['current_title']}"
-    )
-
-    st.write(
-        f"✅ Industry: {profile['current_industry']}"
-    )
-
-    st.write(
-        f"✅ Recruiter Response Rate: {signals['recruiter_response_rate']}"
-    )
-
-    st.write(
-        f"✅ Interview Completion Rate: {signals['interview_completion_rate']}"
-    )
-
-    st.write(
-        f"✅ GitHub Activity Score: {signals['github_activity_score']}"
-    )
-
-    st.write(
-        "✅ Strong semantic similarity with Job Description"
-    )
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.divider()
 
+# =========================
+# ANALYTICS
+# =========================
+
 st.header("📊 Analytics Dashboard")
 
-experience = [
-    c["profile"]["years_of_experience"]
-    for c in candidates
-]
+# Score Distribution
 
-exp_ranges = {
-    "0-3 Years": 0,
-    "3-5 Years": 0,
-    "5-9 Years": 0,
-    "9+ Years": 0
-}
+# Score Distribution (Cleaner Version)
 
-for exp in experience:
+score_ranges = pd.cut(
+    df["score"],
+    bins=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    labels=[
+        "0 - 0.2",
+        "0.2 - 0.4",
+        "0.4 - 0.6",
+        "0.6 - 0.8",
+        "0.8 - 1.0"
+    ]
+)
 
-    if exp < 3:
-        exp_ranges["0-3 Years"] += 1
+score_summary = score_ranges.value_counts().sort_index()
 
-    elif exp < 5:
-        exp_ranges["3-5 Years"] += 1
-
-    elif exp < 9:
-        exp_ranges["5-9 Years"] += 1
-
-    else:
-        exp_ranges["9+ Years"] += 1
-
-exp_chart = pd.DataFrame({
-    "Range": list(exp_ranges.keys()),
-    "Candidates": list(exp_ranges.values())
+score_df = pd.DataFrame({
+    "Score Range": score_summary.index,
+    "Candidates": score_summary.values
 })
 
 fig1 = px.bar(
-    exp_chart,
-    x="Range",
+    score_df,
+    x="Score Range",
     y="Candidates",
-    title="Candidate Experience Groups"
+    text="Candidates",
+    title="Candidate Score Distribution"
+)
+
+fig1.update_traces(
+    textposition="outside"
+)
+
+fig1.update_layout(
+    xaxis_title="Score Range",
+    yaxis_title="Number of Candidates",
+    height=500
 )
 
 st.plotly_chart(
     fig1,
-    use_container_width=True
+    use_container_width=True,
+    key="score_distribution"
 )
 
-all_skills = []
+# Top 20 Candidates
 
-for c in candidates:
-
-    for skill in c["skills"]:
-
-        all_skills.append(
-            skill["name"]
-        )
-
-skill_counts = Counter(all_skills)
-
-top_skills = pd.DataFrame(
-    skill_counts.most_common(10),
-    columns=["Skill", "Count"]
-)
+top20 = df.head(20)
 
 fig2 = px.bar(
-    top_skills,
-    x="Skill",
-    y="Count",
-    title="Top 10 Skills"
+    top20,
+    x="candidate_id",
+    y="score",
+    title="Top 20 Candidate Scores"
 )
 
 st.plotly_chart(
@@ -247,29 +235,48 @@ st.plotly_chart(
     use_container_width=True
 )
 
-industries = [
-    c["profile"]["current_industry"]
-    for c in candidates
-]
+# Rank vs Score
 
-industry_counts = Counter(
-    industries
-)
-
-industry_df = pd.DataFrame(
-    industry_counts.items(),
-    columns=["Industry", "Count"]
-)
-
-fig3 = px.pie(
-    industry_df,
-    names="Industry",
-    values="Count",
-    title="Industry Distribution"
+fig3 = px.line(
+    df,
+    x="rank",
+    y="score",
+    markers=True,
+    title="Rank vs Score"
 )
 
 st.plotly_chart(
     fig3,
     use_container_width=True
+)
+
+# Score Categories
+
+score_bins = pd.cut(
+    df["score"],
+    bins=5
+).value_counts().sort_index()
+
+score_df = pd.DataFrame({
+    "Score Range": score_bins.index.astype(str),
+    "Candidates": score_bins.values
+})
+
+fig4 = px.pie(
+    score_df,
+    names="Score Range",
+    values="Candidates",
+    title="Candidate Score Segments"
+)
+
+st.plotly_chart(
+    fig4,
+    use_container_width=True
+)
+
+st.divider()
+
+st.success(
+    "Top 100 candidates successfully ranked using a Hybrid AI Ranking Engine with Explainable AI reasoning."
 )
 
