@@ -1,0 +1,6 @@
+candidates.jsonl
+
+__pycache__/
+*.pyc
+.venv/
+.env
