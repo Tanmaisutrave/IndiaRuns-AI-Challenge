@@ -4,18 +4,10 @@ import plotly.express as px
 from collections import Counter
 from src.load_data import load_candidates
 
-# --------------------------------------------------
-# PAGE CONFIG
-# --------------------------------------------------
-
 st.set_page_config(
     page_title="AI Candidate Discovery & Ranking",
     layout="wide"
 )
-
-# --------------------------------------------------
-# HEADER
-# --------------------------------------------------
 
 st.title("🚀 AI Candidate Discovery & Ranking System")
 
@@ -31,10 +23,6 @@ This system ranks candidates using:
 - Semantic Re-ranking
 """)
 
-# --------------------------------------------------
-# METRICS
-# --------------------------------------------------
-
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -45,10 +33,6 @@ with col2:
 
 with col3:
     st.metric("Ranking Method", "Hybrid AI")
-
-# --------------------------------------------------
-# TOP 100 TABLE
-# --------------------------------------------------
 
 st.divider()
 
@@ -68,22 +52,14 @@ st.download_button(
     mime="text/csv"
 )
 
-# --------------------------------------------------
-# LOAD DATA
-# --------------------------------------------------
-
 st.divider()
 
-candidates = load_candidates("candidates.jsonl")
+candidates = load_candidates("sample_candidates.json")
 
 candidate_ids = [
     c["candidate_id"]
     for c in candidates
 ]
-
-# --------------------------------------------------
-# PROFILE VIEWER
-# --------------------------------------------------
 
 st.header("👤 Candidate Profile Viewer")
 
@@ -106,9 +82,6 @@ for c in candidates:
         selected_candidate = c
         break
 
-# --------------------------------------------------
-# PROFILE DETAILS
-# --------------------------------------------------
 
 if selected_candidate:
 
@@ -140,10 +113,6 @@ if selected_candidate:
         f"**Summary:** {profile['summary']}"
     )
 
-    # -------------------------
-    # SKILLS
-    # -------------------------
-
     st.subheader("Skills")
 
     skills = [
@@ -152,10 +121,6 @@ if selected_candidate:
     ]
 
     st.write(", ".join(skills))
-
-    # -------------------------
-    # CAREER HISTORY
-    # -------------------------
 
     st.subheader("Career History")
 
@@ -168,10 +133,6 @@ if selected_candidate:
         st.write(job["description"])
 
         st.divider()
-
-# --------------------------------------------------
-# EXPLAINABLE AI
-# --------------------------------------------------
 
 st.header("🤖 Why This Candidate Ranked Highly")
 
@@ -210,17 +171,9 @@ if selected_candidate:
         "✅ Strong semantic similarity with Job Description"
     )
 
-# --------------------------------------------------
-# ANALYTICS DASHBOARD
-# --------------------------------------------------
-
 st.divider()
 
 st.header("📊 Analytics Dashboard")
-
-# -------------------------
-# EXPERIENCE DISTRIBUTION
-# -------------------------
 
 experience = [
     c["profile"]["years_of_experience"]
@@ -265,10 +218,6 @@ st.plotly_chart(
     use_container_width=True
 )
 
-# -------------------------
-# TOP SKILLS
-# -------------------------
-
 all_skills = []
 
 for c in candidates:
@@ -297,10 +246,6 @@ st.plotly_chart(
     fig2,
     use_container_width=True
 )
-
-# -------------------------
-# INDUSTRY DISTRIBUTION
-# -------------------------
 
 industries = [
     c["profile"]["current_industry"]
