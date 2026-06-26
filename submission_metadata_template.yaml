@@ -12,7 +12,7 @@ team_members:
 
 github_repo: "https://github.com/Tanmaisutrave/IndiaRuns-AI-Challenge"
 
-sandbox_link: "https://indiaruns-ai-challenge-msyb6exnu7khfxetshkzgj.streamlit.app/"
+sandbox_link: "https://indiaruns-ai-challenge-zfhv3zgvlcxqhfwxog3pzb.streamlit.app/"
 
 reproduce_command: "python generate_final_submission.py"
 
@@ -31,20 +31,23 @@ ai_tools_used:
   - "ChatGPT"  
 
 ai_usage_summary: |
-  Used ChatGPT for debugging, architecture guidance, scoring strategy,
-  explainability generation, and Streamlit dashboard development.
-  No candidate data was sent to external APIs during ranking.
+  ChatGPT was used for architecture discussions, debugging, feature engineering,
+  explainable AI generation, Streamlit dashboard development, documentation,
+  and code refinement. No external AI APIs or network calls were used during
+  candidate ranking or inference.
 
 methodology_summary: |
-  Built a hybrid candidate ranking system for AI/ML hiring using multiple scoring
-  signals. Candidates are evaluated using AI skill matching, professional experience, title
-  relevance, career history analysis, recruiter engagement metrics, interview completion
-  rates, profile quality, open-to-work status, notice period, and product-company
-  experience. To improve ranking quality and reduce keyword-stuffing bias, career
-  descriptions and behavioral signals are incorporated alongside skills. The system 
-  generates explainable rankings with candidate-specific reasoning and produces the 
-  top 100 ranked candidates in the required competition format. A Streamlit dashboard 
-  was developed for candidate exploration, explainability, and analytics visualization.
+  Developed a Hybrid AI Candidate Ranking Engine that evaluates candidates using
+  multiple ranking signals including AI/ML skill matching, professional experience,
+  career history relevance, behavioral intelligence, education, GitHub activity,
+  recruiter engagement, interview completion rate, profile quality, notice period,
+  product-company experience, and skill assessment scores. Career descriptions are
+  analyzed for retrieval, ranking, recommendation systems, vector databases, and
+  large language model experience to improve relevance beyond simple keyword
+  matching. The system generates normalized candidate scores, explainable ranking
+  justifications, and selects the Top 100 candidates. A Streamlit dashboard was
+  built for candidate exploration, explainable AI insights, analytics, and
+  submission visualization.
 
 declarations:
   read_submission_spec: true        
