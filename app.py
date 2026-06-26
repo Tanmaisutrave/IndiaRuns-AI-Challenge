@@ -1,21 +1,19 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 st.set_page_config(
-    page_title="AI Candidate Discovery & Ranking",
+    page_title="AI Candidate Discovery & Ranking System",
+    page_icon="🚀",
     layout="wide"
 )
 
-# =========================
-# HEADER
-# =========================
-
 st.title("🚀 AI Candidate Discovery & Ranking System")
 
-st.markdown("""
-### India Runs Data & AI Challenge
+st.subheader("India Runs Data & AI Challenge")
 
+st.markdown("""
 This solution ranks AI/ML candidates using:
 
 - AI Skills Matching
@@ -25,29 +23,19 @@ This solution ranks AI/ML candidates using:
 - Interview Reliability Signals
 - Explainable AI Ranking
 """)
-
-# =========================
-# LOAD DATA
-# =========================
-
-df = pd.read_csv("output/final_submission.csv")
-
-# =========================
-# METRICS
-# =========================
-
+submission = pd.read_csv("output/final_submission.csv")
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.metric(
         "Top Candidates",
-        len(df)
+        len(submission)
     )
 
 with col2:
     st.metric(
         "Best Score",
-        round(df["score"].max(), 4)
+        round(submission["score"].max(),2)
     )
 
 with col3:
@@ -55,228 +43,302 @@ with col3:
         "Submission Status",
         "Valid"
     )
-
 st.divider()
-
-# =========================
-# TOP 100 TABLE
-# =========================
 
 st.header("🏆 Top 100 Ranked Candidates")
 
 st.dataframe(
-    df,
+    submission,
     use_container_width=True,
-    height=500
+    height=450
 )
 
 st.download_button(
     label="📥 Download Submission CSV",
-    data=df.to_csv(index=False),
+    data=submission.to_csv(index=False),
     file_name="final_submission.csv",
     mime="text/csv"
 )
-
 st.divider()
-
-# =========================
-# CANDIDATE EXPLORER
-# =========================
 
 st.header("👤 Candidate Explorer")
 
 selected_candidate = st.selectbox(
     "Select Candidate ID",
-    df["candidate_id"]
+    submission["candidate_id"]
 )
 
-candidate = df[
-    df["candidate_id"] == selected_candidate
+candidate = submission[
+    submission["candidate_id"] == selected_candidate
 ].iloc[0]
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.info(
-        f"Candidate ID: {candidate['candidate_id']}"
-    )
-
-    st.success(
-        f"Rank: {candidate['rank']}"
-    )
+    st.info(f"🆔 Candidate ID: {candidate['candidate_id']}")
+    st.success(f"🏆 Rank: #{candidate['rank']}")
 
 with col2:
-    st.warning(
-        f"Score: {candidate['score']}"
-    )
+    st.warning(f"⭐ Score: {candidate['score']:.4f}")
 
-# ==================================
-# WHY THIS CANDIDATE WAS SELECTED
-# ==================================
+# ===========================================
+# Why This Candidate Was Selected
+# ===========================================
 
-st.header("Why This Candidate Was Selected")
+st.markdown("---")
 
-reason = candidate["reasoning"]
+st.markdown("""
+<h1 style='font-size:48px;font-weight:bold;'>
+📄 Why This Candidate Was Selected
+</h1>
+""", unsafe_allow_html=True)
 
-st.markdown(
-    f"""
-    <div style="
-        background: linear-gradient(135deg,#0F172A,#1E293B);
-        padding:30px;
-        border-radius:20px;
-        border-left:8px solid #22C55E;
-        box-shadow:0px 0px 20px rgba(34,197,94,0.3);
-        margin-bottom:25px;
-    ">
+st.markdown(f"""
+<div style="
+background:#1d263b;
+padding:35px;
+border-left:8px solid #2ecc71;
+border-radius:20px;
+box-shadow:0px 0px 18px rgba(46,204,113,0.25);
+">
 
-    <h2 style="color:#22C55E;">
-        🏆 Selection Justification
-    </h2>
+<h1 style="color:#2ecc71;font-size:42px;margin-bottom:20px;">
+🏆 Selection Justification
+</h1>
 
-    <p style="
-        color:white;
-        font-size:20px;
-        line-height:1.8;
-    ">
-        {reason}
-    </p>
+<p style="font-size:28px;
+line-height:1.8;
+color:white;
+margin-bottom:25px;">
+{candidate["reasoning"]}
+</p>
 
-    <hr style="border:1px solid #334155;">
+<hr style="border:1px solid #556070;">
 
-    <h3 style="color:#22C55E;">
-        ✅ Key Reasons
-    </h3>
+<h2 style="color:#2ecc71;
+margin-top:30px;
+font-size:36px;">
+✅ Key Reasons
+</h2>
 
-    <ul style="
-        color:white;
-        font-size:18px;
-        line-height:2;
-    ">
-        <li>Strong AI / ML skill match</li>
-        <li>Relevant experience for the role</li>
-        <li>High recruiter engagement</li>
-        <li>Strong interview completion history</li>
-        <li>Excellent overall ranking score</li>
-    </ul>
+<ul style="
+font-size:25px;
+line-height:2.0;
+color:white;
+">
 
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+<li>Strong AI / ML skill match</li>
 
-st.divider()
+<li>Relevant experience for the role</li>
 
-# =========================
-# ANALYTICS
-# =========================
+<li>High recruiter engagement</li>
 
-st.header("📊 Analytics Dashboard")
+<li>Strong interview completion history</li>
 
-# Score Distribution
+<li>Excellent overall ranking score</li>
 
-# Score Distribution (Cleaner Version)
+</ul>
 
-score_ranges = pd.cut(
-    df["score"],
-    bins=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
-    labels=[
+</div>
+""", unsafe_allow_html=True)
+
+# ===========================================
+# Analytics Dashboard
+# ===========================================
+
+st.markdown("---")
+
+st.markdown("""
+<h1 style='font-size:48px;font-weight:bold;'>
+📊 Analytics Dashboard
+</h1>
+""", unsafe_allow_html=True)
+
+# ------------------------------------------
+# Chart 1 : Candidate Score Distribution
+# ------------------------------------------
+
+st.subheader("Candidate Score Distribution")
+
+bins = [0,0.2,0.4,0.6,0.8,1.0]
+
+distribution = pd.cut(
+    submission["score"],
+    bins=bins,
+    include_lowest=True
+).value_counts().sort_index()
+
+fig = px.bar(
+    x=[
         "0 - 0.2",
         "0.2 - 0.4",
         "0.4 - 0.6",
         "0.6 - 0.8",
         "0.8 - 1.0"
-    ]
+    ],
+    y=distribution.values,
+    text=distribution.values
 )
 
-score_summary = score_ranges.value_counts().sort_index()
-
-score_df = pd.DataFrame({
-    "Score Range": score_summary.index,
-    "Candidates": score_summary.values
-})
-
-fig1 = px.bar(
-    score_df,
-    x="Score Range",
-    y="Candidates",
-    text="Candidates",
-    title="Candidate Score Distribution"
-)
-
-fig1.update_traces(
-    textposition="outside"
-)
-
-fig1.update_layout(
+fig.update_layout(
     xaxis_title="Score Range",
     yaxis_title="Number of Candidates",
+    template="plotly_dark",
     height=500
 )
 
-st.plotly_chart(
-    fig1,
-    use_container_width=True,
-    key="score_distribution"
-)
+st.plotly_chart(fig, use_container_width=True)
 
-# Top 20 Candidates
+# ------------------------------------------
+# Chart 2 : Top 20 Candidate Scores
+# ------------------------------------------
 
-top20 = df.head(20)
+st.subheader("Top 20 Candidate Scores")
 
-fig2 = px.bar(
+top20 = submission.head(20)
+
+fig = px.bar(
     top20,
     x="candidate_id",
     y="score",
-    title="Top 20 Candidate Scores"
+    text="score"
 )
 
-st.plotly_chart(
-    fig2,
-    use_container_width=True
+fig.update_layout(
+    template="plotly_dark",
+    height=500,
+    xaxis_tickangle=-35,
+    xaxis_title="Candidate ID",
+    yaxis_title="Score"
 )
 
-# Rank vs Score
+st.plotly_chart(fig, use_container_width=True)
 
-fig3 = px.line(
-    df,
+# ------------------------------------------
+# Chart 3 : Rank vs Score
+# ------------------------------------------
+
+st.subheader("Rank vs Score")
+
+fig = px.line(
+    submission,
     x="rank",
     y="score",
-    markers=True,
-    title="Rank vs Score"
+    markers=True
 )
 
-st.plotly_chart(
-    fig3,
-    use_container_width=True
+fig.update_layout(
+    template="plotly_dark",
+    height=500,
+    xaxis_title="Rank",
+    yaxis_title="Score"
 )
 
-# Score Categories
+st.plotly_chart(fig, use_container_width=True)
 
-score_bins = pd.cut(
-    df["score"],
-    bins=5
-).value_counts().sort_index()
+# ------------------------------------------
+# Chart 4 : Candidate Score Segments
+# ------------------------------------------
 
-score_df = pd.DataFrame({
-    "Score Range": score_bins.index.astype(str),
-    "Candidates": score_bins.values
-})
+st.subheader("Candidate Score Segments")
 
-fig4 = px.pie(
-    score_df,
-    names="Score Range",
-    values="Candidates",
-    title="Candidate Score Segments"
+labels = [
+    "0 - 0.2",
+    "0.2 - 0.4",
+    "0.4 - 0.6",
+    "0.6 - 0.8",
+    "0.8 - 1.0"
+]
+
+fig = px.pie(
+    values=distribution.values,
+    names=labels,
+    hole=0
 )
 
-st.plotly_chart(
-    fig4,
-    use_container_width=True
+fig.update_layout(
+    template="plotly_dark",
+    height=550
 )
 
-st.divider()
+st.plotly_chart(fig, use_container_width=True)
+
+# ------------------------------------------
+# Footer
+# ------------------------------------------
 
 st.success(
     "Top 100 candidates successfully ranked using a Hybrid AI Ranking Engine with Explainable AI reasoning."
 )
 
+st.markdown("---")
+
+st.markdown("""
+<div style="
+background: linear-gradient(135deg,#0f172a,#1e293b);
+padding:28px;
+border-radius:18px;
+border:1px solid #2d3748;
+text-align:center;
+box-shadow:0 0 12px rgba(0,255,170,0.08);
+margin-top:20px;
+">
+
+<h2 style="
+color:#22c55e;
+margin-bottom:10px;
+font-size:28px;">
+✅ AI Candidate Discovery & Ranking Completed
+</h2>
+
+<p style="
+font-size:18px;
+color:#d1d5db;
+margin-bottom:18px;">
+Successfully ranked the <b>Top 100 AI/ML Candidates</b> using a
+<b>Hybrid AI Ranking Engine</b> powered by skill matching,
+career analysis, behavioral signals, recruiter engagement,
+and explainable AI reasoning.
+</p>
+
+<hr style="border:1px solid #374151; margin:18px 0;">
+
+<div style="
+display:flex;
+justify-content:space-around;
+font-size:16px;
+color:#9ca3af;">
+
+<div>
+<b style="color:white;">📊 Candidates Ranked</b><br>
+100
+</div>
+
+<div>
+<b style="color:white;">🧠 Ranking Signals</b><br>
+23
+</div>
+
+<div>
+<b style="color:white;">🤖 AI Explainability</b><br>
+Enabled
+</div>
+
+<div>
+<b style="color:white;">✔ Submission</b><br>
+Valid
+</div>
+
+</div>
+
+<br>
+
+<p style="
+font-size:14px;
+color:#6b7280;
+margin-top:12px;">
+Developed for the <b>India Runs Data & AI Challenge</b> • Powered by Python, Pandas, Plotly & Streamlit
+</p>
+
+</div>
+""", unsafe_allow_html=True)
